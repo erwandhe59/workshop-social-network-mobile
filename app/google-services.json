@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "829322102937",
+    "project_id": "workshop-social-network-1f9cb",
+    "storage_bucket": "workshop-social-network-1f9cb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829322102937:android:3591b26d454c55dd5d1008",
+        "android_client_info": {
+          "package_name": "com.auchan.ws_socialnetwork_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAseCNT02Ui6rqqn1By9pcCO7YLse1FzZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

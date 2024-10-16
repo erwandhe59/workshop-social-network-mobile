@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <resources>
+        <!-- Primary Colors -->
+        <color name="colorPrimary">#007BFF</color> <!-- Bleu accent -->
+        <color name="colorPrimaryDark">#3700B3</color>
+        <color name="colorAccent">#00C2A1</color> <!-- Vert vif -->
+        <color name="colorBackground">#F5F5F5</color> <!-- Fond clair -->
+        <color name="colorTextDark">#333333</color> <!-- Texte sombre -->
+        <color name="colorTextLight">#BBBBBB</color> <!-- Texte léger -->
+
+        <!-- Surface & Card -->
+        <color name="colorCardBackground">#FFFFFF</color> <!-- Carte blanche -->
+
+        <color name="colorSpinnerBackground">#FFFFFF</color>
+
+    <!-- Shadows -->
+        <color name="colorShadow">#BDBDBD</color> <!-- Ombre douce -->
+    </resources>

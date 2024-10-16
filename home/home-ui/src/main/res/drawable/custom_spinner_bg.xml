@@ -1,0 +1,6 @@
+<!-- res/drawable/custom_spinner_bg.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/colorSpinnerBackground" /> <!-- Fond du Spinner -->
+    <corners android:radius="12dp" /> <!-- Coins arrondis -->
+    <stroke android:width="2dp" android:color="@color/colorPrimary" /> <!-- Bordure -->
+</shape>

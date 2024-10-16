@@ -1,0 +1,19 @@
+<!-- res/drawable/button_style.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Effet quand le bouton est pressé -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorPrimaryDark" />
+            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="@color/colorPrimary" />
+        </shape>
+    </item>
+    <!-- Effet par défaut -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorPrimary" />
+            <corners android:radius="12dp" />
+            <stroke android:width="2dp" android:color="@color/colorPrimaryDark" />
+        </shape>
+    </item>
+</selector>

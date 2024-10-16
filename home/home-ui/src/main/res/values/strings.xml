@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Liste des réseaux sociaux -->
+    <string-array name="social_networks">
+        <item>Facebook</item>
+        <item>Instagram</item>
+        <item>Twitter</item>
+        <item>LinkedIn</item>
+    </string-array>
+
+</resources>
