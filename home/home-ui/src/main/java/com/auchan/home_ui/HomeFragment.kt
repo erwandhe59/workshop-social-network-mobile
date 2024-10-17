@@ -8,6 +8,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +25,7 @@ import com.google.firebase.storage.StorageReference
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
+
 
 class HomeFragment : Fragment(R.layout.home_fragment) {
 
@@ -54,12 +57,18 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerSocialNetwork.adapter = adapter
 
+        // Ajout du listener sur le bouton pour afficher la liste des usernames
+        binding.btnViewUsernames.setOnClickListener {
+            fetchUsernamesFromFirestore()
+        }
+
         // Gestionnaire d'événements pour la sélection du Spinner
         binding.spinnerSocialNetwork.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>, view: View?, position: Int, id: Long) {
                 selectedNetwork = parentView.getItemAtPosition(position) as String
                 Log.d("HomeFragment", "Réseau social sélectionné : $selectedNetwork")
             }
+
 
             override fun onNothingSelected(parentView: AdapterView<*>) {
                 // Pas besoin de gérer cela ici
@@ -74,6 +83,100 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
                 Toast.makeText(requireContext(), "Veuillez sélectionner un réseau social", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    // Méthode pour récupérer les usernames depuis Firestore
+    private fun fetchUsernamesFromFirestore() {
+        val firestore = FirebaseFirestore.getInstance()
+
+        // Récupération de tous les documents dans la collection "images"
+        firestore.collection("images")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val usernameMap = mutableMapOf<String, Int>()
+
+                // Parcourir les documents pour compter le nombre de rapports pour chaque utilisateur
+                querySnapshot.documents.forEach { document ->
+                    val username = document.getString("username")
+                    if (username != null) {
+                        usernameMap[username] = usernameMap.getOrDefault(username, 0) + 1
+                    }
+                }
+
+                if (usernameMap.isNotEmpty()) {
+                    // Appel de la méthode pour afficher la liste des usernames avec le nombre de rapports
+                    showUsernamesDialog(usernameMap)
+                } else {
+                    Toast.makeText(requireContext(), "Aucun username trouvé", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Erreur lors de la récupération des usernames : ", e)
+                Toast.makeText(requireContext(), "Erreur lors de la récupération des usernames", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+    // Méthode pour afficher les usernames dans une boîte de dialogue
+// Méthode pour afficher les usernames dans une boîte de dialogue
+    private fun showUsernamesDialog(usernameMap: Map<String, Int>) {
+        val builder = android.app.AlertDialog.Builder(requireContext())
+        builder.setTitle("Liste des usernames")
+
+        // Créer un EditText pour la recherche
+        val searchEditText = android.widget.EditText(requireContext()).apply {
+            hint = "Search by username"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT
+        }
+
+        // Ajouter l'EditText à la boîte de dialogue
+        builder.setView(searchEditText)
+
+        // Créer une liste formatée avec le username et le nombre de rapports
+        val usernamesWithCounts = usernameMap.map { "${it.key} (${it.value} rapports)" }.toMutableList()
+
+        // Créer un ArrayAdapter pour afficher la liste dans le dialogue
+        val adapter = android.widget.ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            usernamesWithCounts
+        )
+        builder.setAdapter(adapter) { dialog, which ->
+            // Action possible quand un username est sélectionné
+            val selectedUsername = usernamesWithCounts[which].split(" ")[0]
+            Toast.makeText(requireContext(), "Username selected : $selectedUsername", Toast.LENGTH_SHORT).show()
+        }
+
+        // Fonction pour mettre à jour la liste des usernames en fonction du filtre de recherche
+        searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val filter = s.toString().trim()
+                val filteredUsernames = if (filter.startsWith("@")) {
+                    // Filtrer la liste des usernames qui commencent par le caractère '@'
+                    usernameMap.filter { it.key.startsWith(filter) }
+                } else {
+                    // Si le filtre ne commence pas par '@', afficher toute la liste
+                    usernameMap
+                }
+
+                // Mettre à jour l'adaptateur avec la liste filtrée
+                val filteredList = filteredUsernames.map { "${it.key} (${it.value} rapports)" }
+                adapter.clear()
+                adapter.addAll(filteredList)
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Pas besoin de gérer cela ici
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Pas besoin de gérer cela ici
+            }
+        })
+
+        builder.setPositiveButton("Fermer", null)
+        builder.show()
     }
 
     // Méthode pour ouvrir la galerie et sélectionner une image
@@ -154,7 +257,6 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
 
 
     // Méthode pour uploader l'image redimensionnée sur Firebase Storage
-// Méthode pour uploader l'image redimensionnée sur Firebase Storage
     private fun uploadImageToStorage(bitmap: Bitmap, username: String, description: String) {
         Log.d("HomeFragment", "Début de l'upload de l'image redimensionnée")
 
@@ -210,7 +312,7 @@ class HomeFragment : Fragment(R.layout.home_fragment) {
                 binding.progressBar.postDelayed({
                     // Appeler la fonction pour vérifier le statut "safe"
                     checkImageSafety(documentReference.id)
-                }, 10000) // Délai de 10 secondes pour simuler une IA qui traite l'image
+                }, 10000) // 10 secondes
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Erreur lors de l'enregistrement dans Firestore : ", e)
